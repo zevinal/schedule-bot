@@ -1,0 +1,30 @@
+{
+  "dependencies": {
+    "bull": "^4.10.4",
+    "chrono-node": "^2.6.1",
+    "discord.js": "^14.8.0",
+    "pegjs": "^0.10.0"
+  },
+  "name": "schedulebot",
+  "version": "1.0.0",
+  "main": "index.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": "https://github.com/zevinal/schedule-bot",
+  "keywords": [
+    "discord",
+    "schedule",
+    "bot",
+    "discord-js",
+    "discord-bot",
+    "schedule-bot"
+  ],
+  "author": {
+    "name": "Arian Krasniqi",
+    "url": "https://ariankrasniqi.com/"
+  },
+  "license": "MIT",
+  "description": "A scheduling bot for Discord."
+}
