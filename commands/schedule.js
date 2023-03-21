@@ -1,4 +1,5 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const chrono = require('chrono-node');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -9,33 +10,26 @@ module.exports = {
 				.setDescription('The title of the event')
 				.setRequired(true))
 		.addStringOption(option =>
-			option.setName('date')
-				.setDescription('The date of the event (in YYYY-MM-DD format)')
-				.setRequired(true))
-		.addStringOption(option =>
 			option.setName('time')
-				.setDescription('The time of the event (in HH:MM format)')
+				.setDescription('The time of the event')
 				.setRequired(true)),
 
 	async execute(interaction) {
 
 		// Get options from user input
 		const title = interaction.options.getString('title');
-		const date = interaction.options.getString('date');
 		const time = interaction.options.getString('time');
-
-		// Create date object for event
-		const eventDate = new Date(`${date}T${time}:00`);
+		const eventTime = chrono.parseDate(time);
 
 		// Create message embed with event details
 		const embed = new EmbedBuilder()
 			.setColor('#0099ff')
 			.setTitle(title)
-			.setDescription(`Scheduled for ${eventDate.toLocaleString()}`)
+			.setDescription(`${title} has been added to the calendar!`)
 			.addFields(
-				{ name: 'Date', value: date },
-				{ name: 'Time', value: time },
-			);
+				{ name: 'Time', value: `${eventTime}` },
+			)
+			.setTimestamp();
 		// Reply to user with embedded message
 		await interaction.reply({ embeds: [embed] });
 	},
