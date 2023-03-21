@@ -1,0 +1,17 @@
+#logs
+logs
+*.log
+npm-depug.log*
+yarn-debug.log*
+yarn-error.log*
+docs
+
+#dependancy directories
+node_modules/
+
+
+#dotenv environment variables
+.env
+
+#config.json
+config.json

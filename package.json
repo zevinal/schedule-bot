@@ -3,12 +3,15 @@
     "bull": "^4.10.4",
     "chrono-node": "^2.6.1",
     "discord.js": "^14.8.0",
+    "dotenv": "^16.0.3",
     "pegjs": "^0.10.0"
   },
   "name": "schedulebot",
   "version": "1.0.0",
   "main": "index.js",
-  "devDependencies": {},
+  "devDependencies": {
+    "eslint": "^8.36.0"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
