@@ -36,17 +36,36 @@ module.exports = {
 		message.react('👍');
 
 		const filter = (reaction, user) => {
-			return reaction.emoji.name == '👍' && user.id == interaction.user.id;
+			return reaction.emoji.name == '👍' && user.id != message.author.id;
 		};
 
 		const collector = message.createReactionCollector({ filter, time: 60000 });
 
+		const users = new Set();
+
 		collector.on('collect', (reaction, user) => {
 			console.log(`Collected ${reaction.emoji.name} from ${user.tag}`);
+
+			// Add the user to the set of users who reacted with a 👍
+			users.add(user);
 		});
 
 		collector.on('end', collected => {
 			console.log(`Collected ${collected.size} items`);
+
+			// Send a direct message to each user in the set one hour before the event
+			const reminderTime = new Date(eventTime.getTime() - 60 * 60 * 1000);
+			const reminderMessage = `Reminder: ${title} is starting in 1 hour!`;
+
+			users.forEach(async (user) => {
+				try {
+					const dmChannel = await user.createDM();
+					await dmChannel.send(reminderMessage);
+				}
+				catch (error) {
+					console.error(`Failed to send direct message to ${user.tag}: ${error}`);
+				}
+			});
 		});
 
 	},
