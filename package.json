@@ -13,7 +13,9 @@
     "eslint": "^8.36.0"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "node build.js",
+    "start": "node index.js"
   },
   "repository": "https://github.com/zevinal/schedule-bot",
   "keywords": [
