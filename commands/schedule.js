@@ -39,22 +39,60 @@ module.exports = {
 			return reaction.emoji.name == '👍' && user.id != message.author.id;
 		};
 
-		const collector = message.createReactionCollector({ filter, time: 60000 });
+		const collector = message.createReactionCollector({ filter });
 
 		const users = new Set();
 
-		collector.on('collect', (reaction, user) => {
-			console.log(`Collected ${reaction.emoji.name} from ${user.tag}`);
+		collector.on('collect', async (reaction, user) => {
+			if (reaction.emoji.name === '👍') {
+				console.log(`Collected ${reaction.emoji.name} from ${user.tag}`);
+				try {
+					const dmChannel = await user.createDM();
 
-			// Add the user to the set of users who reacted with a 👍
-			users.add(user);
+					const checkEventTime = async () => {
+						const now = new Date();
+						if (eventTime <= now) {
+							await reaction.users.remove(user);
+							clearInterval(intervalId);
+							collector.stop(user.id);
+							return;
+						}
+					};
+
+					const intervalId = setInterval(checkEventTime, 60000);
+
+					const dmEmbed = new EmbedBuilder()
+						.setColor('#0099ff')
+						.setTitle(title)
+						.setDescription(`You have requested a reminder for the event: **${title}**`)
+						.addFields(
+							{ name: 'Time', value: `${eventTime}` },
+							{ name: 'Reminder Set By', value: `${user}` },
+						)
+						.setTimestamp();
+
+					await dmChannel.send({ embeds: [dmEmbed] });
+
+					// Add the user to the set of users who reacted with a 👍
+					users.add(user);
+				}
+				catch (error) {
+					console.error(`Could not send DM to user ${user.tag}.`, error);
+				}
+			}
 		});
+		const reminderTime = new Date(eventTime.getTime() - 60 * 60 * 1000);
+		const now = new Date();
+		const delay = reminderTime.getTime() - now.getTime();
+
+		setTimeout(() => {
+			collector.stop();
+		}, delay);
 
 		collector.on('end', collected => {
 			console.log(`Collected ${collected.size} items`);
 
 			// Send a direct message to each user in the set one hour before the event
-			const reminderTime = new Date(eventTime.getTime() - 60 * 60 * 1000);
 			const reminderMessage = `Reminder: ${title} is starting in 1 hour!`;
 
 			users.forEach(async (user) => {
