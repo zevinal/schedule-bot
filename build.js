@@ -3,7 +3,6 @@ const fs = require('fs');
 const config = {
 	'token': 'your-token-here',
 	'clientId': 'your-client-id',
-	'guildId': 'your-guild-id',
 };
 
 fs.access('config.json', fs.constants.F_OK, (err) => {
