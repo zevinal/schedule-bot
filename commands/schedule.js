@@ -1,5 +1,9 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const chrono = require('chrono-node');
+const fs = require('fs');
+const path = require('path');
+
+const scheduleFile = path.join(__dirname, '../schedule.json');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -75,6 +79,14 @@ module.exports = {
 
 					// Add the user to the set of users who reacted with a 👍
 					users.add(user);
+
+					// Store the event name, time, and the users who reacted in schedule.json
+					const schedule = {
+						eventName: title,
+						eventTime: eventTime.toISOString(),
+						users: Array.from(users, user => user.id),
+					};
+					fs.writeFileSync(scheduleFile, JSON.stringify(schedule));
 				}
 				catch (error) {
 					console.error(`Could not send DM to user ${user.tag}.`, error);
