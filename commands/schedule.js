@@ -33,6 +33,33 @@ function loadSchedule() {
 		console.error(`Failed to read schedule file: ${error}`);
 	}
 }
+function deletePastEvents() {
+	// Load the schedule from the file
+	loadSchedule();
+
+	// Get the current time
+	const now = new Date();
+
+	// Filter out any events whose eventTime is in the past
+	const deletedEvents = [];
+	schedule = schedule.filter((event) => {
+		const eventTime = new Date(event.eventTime);
+		if (eventTime <= now) {
+			deletedEvents.push(event.eventName);
+			return false;
+		}
+		return true;
+	});
+
+	// Save the updated schedule to the file
+	saveSchedule();
+
+	// Log the deleted event names
+	if (deletedEvents.length > 0) {
+		console.log(`Deleted events: ${deletedEvents.join(', ')}`);
+	}
+}
+
 
 // Save schedule to file
 function saveSchedule() {
@@ -41,6 +68,8 @@ function saveSchedule() {
 
 // Load schedule on startup
 loadSchedule();
+deletePastEvents();
+saveSchedule();
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -175,12 +204,19 @@ module.exports = {
 			console.log(`Collected ${collected.size} items`);
 
 			// Send a direct message to each user in the set one hour before the event
-			const reminderMessage = `Reminder: ${title} is starting in 1 hour!`;
+			const dmEmbed = new EmbedBuilder()
+				.setColor('#0099ff')
+				.setTitle(title)
+				.setDescription(`Reminder! **${title}** is starting in 1 hour.`)
+				.addFields(
+					{ name: 'Time', value: `${eventTime}` },
+				)
+				.setTimestamp();
 
 			users.forEach(async (user) => {
 				try {
 					const dmChannel = await user.createDM();
-					await dmChannel.send(reminderMessage);
+					await dmChannel.send(dmEmbed);
 				}
 				catch (error) {
 					console.error(`Failed to send direct message to ${user.tag}: ${error}`);
@@ -190,3 +226,4 @@ module.exports = {
 
 	},
 };
+setInterval(deletePastEvents, 86400000);

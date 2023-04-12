@@ -1,9 +1,9 @@
 const fs = require('node:fs');
 const path = require('node:path');
-const { Client, Collection, GatewayIntentBits } = require('discord.js');
+const { Client, Collection, GatewayIntentBits, Partials } = require('discord.js');
 const { token } = require('./config.json');
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMessageReactions] });
+const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMessageReactions, GatewayIntentBits.GuildMembers, GatewayIntentBits.DirectMessages, GatewayIntentBits.MessageContent], partials: [Partials.Channel, Partials.Message] });
 
 client.commands = new Collection();
 
@@ -11,6 +11,13 @@ const commandsPath = path.join(__dirname, 'commands');
 const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
 const eventsPath = path.join(__dirname, 'events');
 const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
+
+client.on('messageCreate', (message) => {
+	console.log(`Direct message received from ${message.author.tag}: ${message.content}`);
+	if (message.content.toLowerCase().includes('thank')) {
+		message.reply('You\'re Welcome!');
+	}
+});
 
 for (const file of commandFiles) {
 	const filePath = path.join(commandsPath, file);
@@ -37,3 +44,4 @@ for (const file of eventFiles) {
 
 // Log in to Discord with your client's token
 client.login(token);
+module.exports = { client };
